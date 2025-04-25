@@ -1,0 +1,127 @@
+@if(request){
+    <div class="form">
+        <div class="form-navigation">
+            <div cdkDropListGroup>
+                @for(section of request.sections; track section.id; let idx = $index) {
+                    <div class="form-nav-section">
+                        <div class="nav-section-header" (click)="scrollToSection(idx)"> {{section.name}} </div>
+                
+                        <div class="nav-questions-list" cdkDropList (cdkDropListDropped)="drop($event, idx)" [id]="'nav-category-' + idx" [cdkDropListConnectedTo]="connectedNavDropLists">
+                            <div *ngFor="let question of section.questions; let i = index" class="nav-question-card" cdkDrag cdkDragLockAxis="y" (click)="scrollToQuestion(idx, i)">
+                                <div class="drag-handle" cdkDragHandle>⋮⋮</div>
+                                <div class="nav-question-content">  {{question.text | stringLimit: 20}}   </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="form-editor">
+            <header class="form-header">
+              <div class="back-button" (click)="navigateBack()">
+                <span class="arrow">←</span>
+                Back to Forms
+              </div>
+              <div class="control-buttons">
+                <button class="pin-button">Pin Form</button>
+                <button class="delete-button">Delete Form</button>
+                <button class="save-button" (click)="saveForm()">Save Form</button>
+              </div>
+            </header>
+             
+            <div class="form-content">
+                <div class="form-section">
+                    <label class="section-label">Form Name</label>
+                    <input type="text" [(ngModel)]="request.name" placeholder="Enter form name" class="form-input">
+                </div>
+                <div class="form-section">
+                    <label class="section-label">Form Description</label>
+                    <input type="text" [(ngModel)]="request.description" placeholder="Enter form description" class="form-input">
+                </div>
+            
+                <div cdkDropListGroup>
+                    @for(section of request.sections; track section.id; let idx = $index) {
+                        <div class="form-section">
+                            <div class="section-header">
+                                <div class="form-section">
+                                    <label class="section-label">Section Name</label>
+                                    <input type="text" [(ngModel)]="section.name" placeholder="Enter section name" class="form-input">
+                                </div>
+                            </div>
+                    
+                            <div class="questions-list" cdkDropList (cdkDropListDropped)="drop($event, idx)" [id]="'category-' + idx" [cdkDropListConnectedTo]="connectedDropLists">
+                                <div *ngFor="let question of section.questions; let i = index" class="question-card" [id]="'question-' + idx + '-' + i" cdkDrag cdkDragLockAxis="y">
+                                    <div class="question-header">
+                                        <div class="drag-handle" cdkDragHandle>⋮⋮</div>
+                                        <div class="question-buttons">
+                                            <div style="padding-top: 0.5rem; font-weight: 500;">Required</div>
+                                            <div class="toggle-container">
+                                                <label class="toggle-label">No</label>
+                                                <p><mat-slide-toggle [(ngModel)]="question.required"></mat-slide-toggle></p>
+                                                <label class="toggle-label">Yes</label>
+                                            </div>
+                                            <button class="conditional-button" (click)="onViewConditionalVisibility(question)">Conditional Visibility</button>
+                                            <button class="delete-button" (click)="removeQuestion(idx, i)">Delete</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="question-content">
+                                        <div class="input-group">
+                                            <label>Question Text</label>
+                                            <input type="text" [(ngModel)]="question.text" placeholder="Enter question text">
+                                        </div>
+    
+                                        <div class="input-group">
+                                            <label>Question Type</label>
+                                            <select [(ngModel)]="question.type">
+                                                @for(type of questionTypes; track type) {
+                                                    <option [value]="type">{{ type }}</option>
+                                                }
+                                            </select>
+                                        </div>
+    
+                                        @if(question.type === 'SingleChoice' || question.type === 'MultipleChoice' || question.type === 'Dropdown') {
+                                            <div class="answer-options">
+                                                <div class="options-header">
+                                                    <label>Answer Options</label>
+                                                    <button class="add-option-button" (click)="addOption(question)">
+                                                        <span class="plus">+</span>
+                                                        Add Option
+                                                    </button>
+                                                </div>
+                                                
+                                                <div class="options-list">
+                                                    @for(option of question.options; track option; let optionIndex = $index) {
+                                                        <div class="option-item">
+                                                            @if(question.type === 'SingleChoice') {
+                                                                <lucide-angular [size]="16" [img]="Circle"></lucide-angular>
+                                                            } @else if(question.type === 'MultipleChoice') {
+                                                                <lucide-angular [size]="16" [img]="Square"></lucide-angular>
+                                                            }
+                                                            <input type="text" [(ngModel)]="question.options[optionIndex]" class="form-input" placeholder="Enter option text">
+                                                            <button class="remove-option" (click)="removeOption(question, optionIndex)">×</button>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="add-button" (click)="addQuestion(idx)">
+                                <span class="plus">+</span>
+                                Add Question
+                            </button>
+                        </div>
+                    }
+                </div>
+                
+                <button class="add-section-button" (click)="addSection()">
+                    <span class="plus">+</span>
+                    Add Section
+                </button>
+            </div>
+        </div>  
+    </div>       
+}

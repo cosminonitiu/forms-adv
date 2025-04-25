@@ -1,0 +1,101 @@
+<div class="basic-dialog-title theme-font-color theme-basic-background">
+  <div class="dialog-title-info"></div>
+  <div class="dialog-close" (click)="onNoClick()">
+    x
+  </div>
+</div>
+<div  mat-dialog-content class="basic-dialog-body theme-basic-background">
+  @if(data.submittedRequest) {
+    <div class="form-container">
+      <div class="form-header">
+        <h1 class="form-title">{{ data.submittedRequest.formName }}</h1>
+        <p class="form-description">{{ data.submittedRequest.description }}</p>
+      </div>
+    
+      <div class="form-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="(currentSectionIndex + 1) / data.submittedRequest.sections.length * 100"></div>
+        </div>
+        <div class="progress-text">Section {{ currentSectionIndex + 1 }} of {{ data.submittedRequest.sections.length }}</div>
+      </div>
+    
+      <div class="form-section">
+        <h2 class="section-title">{{ currentSection?.name }}</h2>
+        
+        <div class="questions-container">
+          @if(currentSection){
+            @for (question of currentSection.questions; track question.questionId; let idx = $index) {
+              @if(question.visible !== false) {
+                <div class="question">
+                  <label class="question-text">{{ question.text }}</label>
+                  
+                  @if (question.type === 'Text') {
+                      <input type="text" class="text-input" [ngModel]="question.answer" disabled>
+                  }
+                  
+                  @else if (question.type === 'SingleChoice') {
+                      <input type="text" class="text-input" [ngModel]="question.answer" disabled>
+                  }
+                  
+                  @else if (question.type === 'MultipleChoice') {
+                      <input type="text" class="text-input" [ngModel]="question.answer" disabled>
+                  }
+      
+                  @else if (question.type === 'Dropdown') {
+                      <input type="text" class="text-input" [ngModel]="question.answer" disabled>
+                  }
+      
+                  @else if (question.type === 'AD') {
+                      <input type="text" class="text-input" [ngModel]="question.answer" disabled>
+                  }
+                  
+      
+                  @else if (question.type === 'YesNo') {
+                    <div class="toggle-container">
+                      <label class="toggle-label">No</label>
+                      <p><mat-slide-toggle disabled [ngModel]="question.booleanAnswer"></mat-slide-toggle></p>
+                      <label class="toggle-label">Yes</label>
+                    </div>
+                  }
+      
+                  @else if (question.type === 'Date') {
+                    <input type="date" class="date-input" [ngModel]="question.answer" disabled>
+                  }
+                </div> 
+                @if(idx !== currentSection.questions.length - 1) {
+                  <div class="question-delimiter"></div>
+                }
+              }
+            }
+          }
+        </div>
+      </div>
+    
+      <div class="navigation-buttons">
+        <button class="nav-button prev" (click)="previousSection()" [disabled]="isFirstSection">
+          Previous
+        </button>
+        @if(data.viewOnly === false){
+          <button class="nav-button button-outline-main-color" (click)="reject()">Reject</button>
+        }
+        @if(isLastSection) {
+          @if(data.viewOnly === false){
+            <button class="nav-button next" (click)="approve()">
+              Approve
+            </button>
+          }
+        } @else {
+          <button class="nav-button next" (click)="nextSection()">
+            Next
+          </button>
+        }
+      </div>
+    </div>
+  } @else {
+    <div mat-dialog-actions class="buttons-wrapper">
+      <button class="basic-button button-outline-main-color" type="button" (click)="onNoClick()">Close</button>
+    </div>
+  }
+  
+</div>
+  

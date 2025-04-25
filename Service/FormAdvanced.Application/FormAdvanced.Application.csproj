@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FormAdvanced.BuildingBlocks\FormAdvanced.BuildingBlocks.csproj" />
+    <ProjectReference Include="..\FormAdvanced.Domain\FormAdvanced.Domain.csproj" />
+    <ProjectReference Include="..\FormAdvanced.Infrastructure\FormAdvanced.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

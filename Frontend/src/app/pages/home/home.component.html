@@ -1,0 +1,291 @@
+<div class="aumovio-layout"> 
+  @if(userStore.loginDisplay) {
+    <div class="account">
+      <div class=account-notifications>
+        <lucide-angular [img]="Bell" [size]="24" (click)="$event.stopPropagation(); openNotificationScreen()"></lucide-angular>
+        @if(userStore.currentNotifications.length >0 ){
+          <div class="notifications-number">{{userStore.currentNotifications.length}}</div>
+        } 
+        @if(isNotificationScrenOpen === true) {
+          <div class="notifications" id="notifications">
+            @for(n of userStore.currentNotifications; track n.id; let nIdx = $index) {
+              @if(n.type === 'approve') {
+                <div class="notication" (click)="navigateToApproveRequestFromNotif(n, nIdx)">
+                  <div class="notification-header">
+                    <lucide-angular [img]="CircleCheck" [size]="24"></lucide-angular>
+                    Approval Required
+                  </div>
+                  <div class="notification-text">{{n.formRequestName}} ( Requester: {{n.requesterName}} )</div>
+                </div>
+              }
+            }
+          </div>
+        } 
+      </div>
+      <div class="account-image">
+        <lucide-angular [img]="Contact" [size]="24"></lucide-angular>
+      </div>
+      @if(userStore.currentAccount){
+        <div class="account-properties">
+          <div class="account-name">{{userStore.currentAccount.name}}</div>
+          <div class="account-email">{{userStore.currentAccount.username}}</div> 
+        </div>
+      }
+      <div class="account-logout" (click)="userStore.logout()">
+        <lucide-angular [img]="LogOut" [size]="24"></lucide-angular>
+      </div>
+    </div> 
+  }
+  <div class="scroll-container">
+    <div class="banner-container">
+      <div class="banner" >
+        <div class="aumovio">AUMOVIO</div>
+        <div class="omniforms">
+          <div class="title">OmniForms</div>
+          <div class="description">More than a portal — OmniForms is the fast lane to getting what you need at work. Raise requests, get approvals, and tap into resources seamlessly, all from one modern interface.</div>
+        </div>
+      </div>
+    </div>
+    <div class="parallel">
+      <div class="main main-1" [class.active]="active === 'main-1'" [class.inactive-left]="active === 'main-2'">
+        <div class="pinned-requests">
+          <div class="header">
+            <div class="header-text">Pinned Requests</div>
+            <div class="header-actions">
+              @if(manageMode === false){
+                <div class="header-button" (click)="switchManageMode()">Switch to Manage Mode</div>
+              } @else {
+                <div class="header-button" (click)="switchManageMode()">Switch to Submit Mode</div>
+              }
+            </div>
+          </div>
+          <div class="divider"></div>
+          @if(manageMode === false){
+            @if(loadingState.pinnedRequests === false) {
+              <div class="card-grid">
+                @for(request of pinnedRequests; track request.id) {
+                  <div class="card-container">
+                    <app-request-card [request]="request" [manageMode]="false" (generatePdf)="onDownloadPDF(request)"></app-request-card>
+                  </div>  
+                }   
+              </div>
+            } @else {
+              <div class="loading">
+                <mat-spinner></mat-spinner>
+              </div>
+            }
+          } @else {
+            @if(loadingState.pinnedManagedRequests === false) {
+              <div class="card-grid">
+                @for(request of pinnedManagedRequests; track request.id) {
+                  <div class="card-container">
+                    <app-request-card [request]="request" [manageMode]="true" (generatePdf)="onDownloadPDF(request)"></app-request-card>
+                  </div>  
+                }   
+              </div>
+            } @else {
+              <div class="loading">
+                <mat-spinner></mat-spinner>
+              </div>
+            }
+          } 
+        </div>
+        <div class="overview">
+          <div class="submitted">
+            <div class="header">
+              <div class="header-text">Your submitted requests</div>
+              <div class="header-actions">
+                
+                <div class="filters">
+                  <div class="input-group">
+                    <label>Request</label>
+                    <select>
+                        @for(type of allRequest; track type) {
+                            <option [value]="type.id">{{ type.name }}</option>
+                        }
+                    </select>
+                  </div>
+                  <div class="input-group">
+                    <label>Status</label>
+                    <select>
+                        @for(status of statuses; track status) {
+                            <option [value]="status">{{ status }}</option>
+                        }
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            @if(loadingState.myRequests === false) {
+              @if(submittedRequests.length > 0){
+                <div class="table">
+                  <div class="table-wrapper">
+                    <div class="table-wrapper-2">
+                      <div class="table-wrapper-3">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th scope="col" class="checkbox-col">
+                                <input type="checkbox">
+                              </th>
+                              <th scope="col">Form Name</th>
+                              <th scope="col">State</th>
+                              <th scope="col">Current Approver UID</th>
+                              <th scope="col">Current Approver Name</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let request of submittedRequests" (click)="request.state === 'Draft' ? navigateToEditRequest(request) : navigateToViewRequest(request)">
+                              <td class="checkbox-col">
+                                <input type="checkbox">
+                              </td>
+                              <td>{{ request.formName }}</td>
+                              <td>
+                                <span [class]="'chip ' + getStateClass(request.state)">
+                                  {{ request.state }}
+                                </span>
+                              </td>
+                              <td>{{ request.approverUID }}</td>
+                              <td>{{ request.approverName }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              } @else {
+                <div class="no-requests">
+                  <h3>No Requests submitted</h3>
+                </div>
+              } 
+            } @else {
+              <div class="loading">
+                <mat-spinner></mat-spinner>
+              </div>
+            }
+          </div>
+          <div class="approve">
+            <div class="header">
+              <div class="header-text">Requests awaiting your approval</div>
+              <div class="header-actions">
+                <div class="filters">
+                  <div class="input-group">
+                    <label>Request</label>
+                    <select>
+                        @for(type of allRequest; track type) {
+                            <option [value]="type.id">{{ type.name }}</option>
+                        }
+                    </select>
+                  </div>
+                  <div class="input-group">
+                    <label>Status</label>
+                    <select>
+                        @for(status of statuses; track status) {
+                            <option [value]="status">{{ status }}</option>
+                        }
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            @if(loadingState.myRequests === false) {
+              @if(requestsToApprove.length > 0){
+                <div class="table">
+                  <div class="table-wrapper">
+                    <div class="table-wrapper-2">
+                      <div class="table-wrapper-3">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th scope="col" class="checkbox-col">
+                                <input type="checkbox">
+                              </th>
+                              <th scope="col">Form Name</th>
+                              <th scope="col">Requestor UID</th>
+                              <th scope="col">Requestor Name</th>
+                              <th scope="col">Created</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let request of requestsToApprove" (click)="navigateToApproveRequest(request)">
+                              <td class="checkbox-col">
+                                <input type="checkbox">
+                              </td>
+                              <td>{{ request.formName }}</td>
+                              <td>{{ request.owner }}</td>
+                              <td>{{ request.ownerName }}</td>
+                              <td>{{ request.created }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              } @else {
+                <div class="no-requests">
+                  <h3>No Requests waiting for approval</h3>
+                </div>  
+              }
+            } @else {
+              <div class="loading">
+                <mat-spinner></mat-spinner>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="move-button">
+          <div class="move"><div class="vertical-button" (click)="switchTo('main-2')">View All Requests</div></div>
+        </div>
+      </div>
+      <div class="main main-2" [class.active]="active === 'main-2'" [class.inactive-right]="active === 'main-1'">
+        <div class="move-button">
+          <div class="move"><div class="vertical-button" (click)="switchTo('main-1')">Back to Overview</div></div>
+        </div>
+        <div class="all-requests">
+          <div class="header">
+            <div class="header-text">All Requests</div>
+            <div class="header-actions">
+              @if(manageMode === false){
+                <div class="header-button" (click)="switchManageMode()">Switch to Manage Mode</div>
+              } @else {
+                <div class="header-button" (click)="switchManageMode()">Switch to Submit Mode</div>
+              }
+            </div>
+          </div>
+          <div class="divider"></div>
+          @if(manageMode === false){
+            @if(loadingState.formRequests === false) {
+              <div class="card-grid">
+                @for(request of allRequest; track request.id) {
+                  <div class="card-container">
+                    <app-request-card [request]="request" [manageMode]="false" (generatePdf)="onDownloadPDF(request)"></app-request-card>
+                  </div>  
+                }   
+              </div>
+            } @else {
+              <div class="loading">
+                <mat-spinner></mat-spinner>
+              </div>
+            }
+          } @else {
+            @if(loadingState.manageRequests  === false) {
+              <div class="card-grid">
+                @for(request of allManagedRequests; track request.id) {
+                  <div class="card-container">
+                    <app-request-card [request]="request" [manageMode]="true" (generatePdf)="onDownloadPDF(request)"></app-request-card>
+                  </div>  
+                }   
+              </div>
+            } @else {
+              <div class="loading">
+                <mat-spinner></mat-spinner>
+              </div>
+            }
+          } 
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

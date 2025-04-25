@@ -1,0 +1,42 @@
+@if(request()) {
+    @if(manageMode() === true) {
+        <div class="card"  [ngStyle]="{'border-color': request()?.color}">
+            <div class="card-header">
+                <div class="icon">
+                    <div class="card-icon" [ngStyle]="{'background-color': request()?.color}"></div>
+                    <lucide-angular [ngStyle]="{'color': request()?.color}" [name]="request()?.icon" [size]="20"></lucide-angular>
+                </div>
+                <div class="card-body">
+                    <h3>{{request()?.name}}</h3>
+                </div>
+            </div>
+            <p class="card-description">{{request()?.description}}</p> 
+            <div class="card-actions">
+                <div class="body-button"  [ngStyle]="{'background-color': request()?.color}" (click)="editRequest()">
+                    EDIT
+                </div>
+                <div class="body-button"  [ngStyle]="{'background-color': request()?.color}" (click)="exportToPdf()">
+                    EXPORT PDF
+                </div>
+            </div>
+        </div>
+    } @else {
+        <div class="card"  [ngStyle]="{'border-color': request()?.color}">
+            <div class="card-header">
+                <div class="icon">
+                    <div class="card-icon" [ngStyle]="{'background-color': request()?.color}"></div>
+                    <lucide-angular [ngStyle]="{'color': request()?.color}" [name]="request()?.icon" [size]="20"></lucide-angular>
+                </div>
+                <div class="card-body">
+                    <h3>{{request()?.name}}</h3>
+                </div>
+            </div>
+            <p class="card-description">{{request()?.description}}</p> 
+            <div class="card-actions">
+                <div class="body-button"  [ngStyle]="{'background-color': request()?.color}" (click)="createRequest()">
+                    SUBMIT
+                </div>
+            </div>
+        </div>
+    }
+}

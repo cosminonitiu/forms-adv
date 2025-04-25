@@ -1,0 +1,138 @@
+<div class="basic-dialog-title theme-font-color theme-basic-background">
+  <div class="dialog-title-info">
+  </div>
+  <div class="dialog-close" (click)="onNoClick()">
+    x
+  </div>
+</div>
+<div  mat-dialog-content class="basic-dialog-body theme-basic-background">
+
+  @if(formToSubmit) {
+    <div class="form-container">
+      <div class="form-header">
+        <h1 class="form-title">{{ formToSubmit.formName }}</h1>
+        <p class="form-description">{{ formToSubmit.description }}</p>
+      </div>
+    
+      <div class="form-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="(currentSectionIndex + 1) / formToSubmit.sections.length * 100"></div>
+        </div>
+        <div class="progress-text">Section {{ currentSectionIndex + 1 }} of {{ formToSubmit.sections.length }}</div>
+      </div>
+    
+      <div class="form-section">
+        <h2 class="section-title">{{ currentSection?.name }}</h2>
+        
+        <div class="questions-container">
+          @if(currentSection){
+            @for (question of currentSection.questions; track question.questionId; let idx = $index) {
+              @if(question.visible) {
+                <div class="question">
+                  <label class="question-text">{{ question.text }}</label>
+                  
+                  @if (question.type === 'Text') {
+                    <input type="text" class="text-input" placeholder="Type your answer here..." [(ngModel)]="question.answer" (ngModelChange)="question.conditionalVisibilityTriggerForOtherQuestion.length > 0 ? onAnswerChange(question) : null">
+                  }
+                  
+                  @else if (question.type === 'SingleChoice') {
+                    <div class="options-container">
+                      @for (option of question.options; track option) {
+                        <label class="option">
+                          <input type="radio" name="question-{{question.questionId}}" [value]="option" [(ngModel)]="question.answer" (ngModelChange)="question.conditionalVisibilityTriggerForOtherQuestion.length > 0 ? onAnswerChange(question) : null">
+                          <span class="option-text">{{ option }}</span>
+                        </label>
+                      }
+                    </div>
+                  }
+                  
+                  @else if (question.type === 'MultipleChoice') {
+                    <div class="options-container">
+                      @for (option of question.options; track option) {
+                        <label class="option">
+                          <input type="checkbox" [value]="option" [checked]="multiIsChecked(question, option)" (change)="multiSelect(question, option)">
+                          <span class="option-text">{{ option }}</span>
+                        </label>
+                      }
+                    </div>
+                  }
+      
+                  @else if (question.type === 'Dropdown') {
+                    <div class="input-group">
+                      <select [(ngModel)]="question.answer" (ngModelChange)="question.conditionalVisibilityTriggerForOtherQuestion.length > 0 ? onAnswerChange(question) : null">
+                          @for(option of question.options; track option) {
+                              <option [value]="option">{{ option }}</option>
+                          }
+                      </select>
+                    </div>
+                  }
+      
+  
+                  @else if (question.type === 'AD') {
+                    <div class="input-group">
+                      <select [(ngModel)]="question.answer" (ngModelChange)="question.conditionalVisibilityTriggerForOtherQuestion.length > 0 ? onAnswerChange(question) : null">
+                          @for(option of ADOptions; track option.id) {
+                              <option [value]="option.id">{{ option.displayName }} ( {{option.userPrincipalName}} )</option>
+                          }
+                      </select>
+                    </div>
+                  } 
+                  
+      
+                  @else if (question.type === 'YesNo') {
+                    <div class="toggle-container">
+                      <label class="toggle-label">No</label>
+                      <p><mat-slide-toggle [(ngModel)]="question.booleanAnswer" (ngModelChange)="onYesNoAnswerChange(question)"></mat-slide-toggle></p>
+                      <label class="toggle-label">Yes</label>
+                    </div>
+                  }
+      
+                  @else if (question.type === 'Date') {
+                    <input type="date" class="date-input" [(ngModel)]="question.answer" (ngModelChange)="question.conditionalVisibilityTriggerForOtherQuestion.length > 0 ? onAnswerChange(question) : null">
+                  }
+                </div> 
+                @if(question.required === true){
+                  <div class="question-required">Required</div>
+                }
+                @if(idx !== currentSection.questions.length - 1) {
+                  <div class="question-delimiter"></div>
+                }
+              } 
+            }
+          }
+        </div>
+      </div>
+    
+      <div class="navigation-buttons">
+        <button class="nav-button prev" (click)="previousSection()" [disabled]="isFirstSection">
+          Previous
+        </button>
+        @if(data.draft === true) {
+          <button class="nav-button button-outline-main-color" (click)="update()">Update</button>
+        } @else {
+          <button class="nav-button button-outline-main-color" (click)="saveAsDraft()">Save Draft</button>
+        }
+        @if(isSectionRequiredDone()) {
+          @if(isLastSection) {
+            <button class="nav-button next" (click)="submit()">
+              Submit
+            </button>
+          } @else {
+            <button class="nav-button next" (click)="nextSection()">
+              Next
+            </button>
+          }
+        } @else {
+          <button class="nav-button prev"  [disabled]="true">
+            Section not completed
+          </button>
+        } 
+      </div>
+    </div>
+  } @else {
+    <div mat-dialog-actions class="buttons-wrapper">
+      <button class="basic-button button-outline-main-color" type="button" (click)="onNoClick()">Close</button>
+    </div>
+  }
+  
+</div>

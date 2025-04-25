@@ -1,0 +1,78 @@
+<div class="basic-dialog-title theme-font-color theme-basic-background">
+    <div class="dialog-title-info">
+      <span><h3>Conditional Visiblity</h3></span>
+    </div>
+    <div class="dialog-close" (click)="onNoClick()">
+      x
+    </div>
+</div>
+<div  mat-dialog-content class="basic-dialog-body theme-basic-background">
+
+    <div class="conditions">
+
+        @for(cond of currentConditions; track cond) {
+            <div class="condition">
+
+                <div class="input-group">
+                    <label>Section</label>
+                    <select [(ngModel)]="cond.sectionId" (change)="onSectionChange(cond)">
+                        @for(section of data.request.sections; track section.id) {
+                            <option [value]="section.id">{{ section.name }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Question</label>
+                    <select [(ngModel)]="cond.questionId">
+                        @for(question of cond.possibleQuestions; track question.id) {
+                            <option [value]="question.id">{{ question.text | stringLimit: 15 }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Selection Type</label>
+                    <select [(ngModel)]="cond.type">
+                        @for(ty of possibleTypes; track ty) {
+                            <option [value]="ty">{{ ty }}</option>
+                        }
+                    </select>
+                </div>
+
+                @if(cond.type === 'Equals' || cond.type === 'NotEquals') {
+                    <div class="input-group">
+                        <label>Value</label>
+                        <input type="text" [(ngModel)]="cond.option" placeholder="Enter value" class="form-input">
+                    </div>
+                }
+                @if(cond.type === 'Contains' || cond.type === 'NotContains') {
+                    <div class="condition-options">
+                        @for(option of cond.options; track option; let idx = $index) {
+                            <div class="option">
+                                <div class="input-group">
+                                    <input type="text" [(ngModel)]="cond.options[idx]" placeholder="Enter value" class="form-input">
+                                </div>
+                            </div>
+                        }
+                        <button class="add-button" (click)="addOption(cond)">
+                            <span class="plus">+</span>
+                            Add Option
+                        </button>
+                    </div>
+                }
+            </div>
+        }
+
+        <button class="add-button" (click)="addCondition()">
+            <span class="plus">+</span>
+            Add Condition
+        </button>
+    </div>
+    
+    <div mat-dialog-actions class="buttons-wrapper">
+      <button class="basic-button button-main-color" type="button" (click)="onSave()">Save</button>
+      <button class="basic-button button-outline-main-color" type="button" (click)="onNoClick()">Close</button>
+    </div>
+</div>
+  

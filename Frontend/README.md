@@ -1,0 +1,9 @@
+- CACHE
+- ADD Right permissions to approve, view, etc
+- Instead of picking all icons, pick specific ones from lucide angular (app module)
+- Integrate all wise servies into Program.cs
+- Handle all NoSQL exceptions like maybe wrong owner instead of wrong id and etc
+- Partial document update https://learn.microsoft.com/en-us/azure/cosmos-db/partial-document-update
+- Handle null references
+- Make a centralized notification store in user store that handles stuff like if you alreayd approved, rejected, stuff like that
+- Delete notifications on Reject and Approve

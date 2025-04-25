@@ -1,0 +1,79 @@
+<!-- Header Section -->
+<div class="requests">
+  @if(approvalMode === false) {  
+    <div class="filters">
+      <div class="input-group">
+        <label>Request</label>
+        <select [(ngModel)]="selectedRequestId" (ngModelChange)="selectedRequestChange()">
+            @for(type of requests; track type) {
+                <option [value]="type.id">{{ type.name }}</option>
+            }
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Status</label>
+        <select [(ngModel)]="selectedStatus" (ngModelChange)="selectedStatusChange()">
+            @for(status of statuses; track status) {
+                <option [value]="status">{{ status }}</option>
+            }
+        </select>
+      </div>
+    </div>
+  } @else {
+
+  }
+  
+  <!-- Table Section -->
+  <div class="table">
+    <div class="table-wrapper">
+      <div class="table-wrapper-2">
+        <div class="table-wrapper-3">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col" class="checkbox-col">
+                  <input type="checkbox">
+                </th>
+                <th scope="col">Form Name</th>
+                @if(approvalMode === true){
+                  <th scope="col">Requestor UID</th>
+                  <th scope="col">Requestor Name</th>
+                  <th scope="col">Created</th>
+                }
+                @if(approvalMode === false) {
+                  <th scope="col">State</th>
+                  <th scope="col">Current Approver UID</th>
+                  <th scope="col">Current Approver Name</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let request of filteredRequests" (click)="
+                approvalMode === true ? navigateToApproveRequest(request) : 
+                request.state === 'Draft' ? navigateToEditRequest(request) : navigateToViewRequest(request)">
+                <td class="checkbox-col">
+                  <input type="checkbox">
+                </td>
+                <td>{{ request.formName }}</td>
+                @if(approvalMode === true){
+                  <td>{{ request.owner }}</td>
+                  <td>{{ request.ownerName }}</td>
+                  <td>{{ request.created }}</td>
+                }
+                @if(approvalMode === false){
+                  <td>
+                    <span [class]="'chip ' + getStateClass(request.state)">
+                      {{ request.state }}
+                    </span>
+                  </td>
+                  <td>{{ request.approverUID }}</td>
+                  <td>{{ request.approverName }}</td>
+                }
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

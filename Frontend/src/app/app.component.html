@@ -1,0 +1,12 @@
+@if(userStore.loginDisplay === true) {
+  <router-outlet *ngIf="!isIframe"></router-outlet>
+} @else {
+  <div class="login">
+    <div class="login-form" (click)="userStore.loginRedirect()">
+      <img src="../assets/images/azure-b2c.svg" alt="azure-logo-b2c" />
+      <div>Login with Azure</div>
+    </div>
+  </div>
+}   
+
+
