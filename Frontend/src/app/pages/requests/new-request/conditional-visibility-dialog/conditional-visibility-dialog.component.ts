@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ConditionalVisibility, FormQuestion, FormQuestionNoConditionals, FormRequest, FormSection } from '../../../shared/models/form-request';
-import { SnackbarHelperService } from '../../../services/shared/snackbar-helper.service';
+import { ConditionalVisibility, FormQuestion, FormQuestionNoConditionals, FormRequest, FormSection } from '../../../../shared/models/form-request';
+import { SnackbarHelperService } from '../../../../services/shared/snackbar-helper.service';
 
 @Component({
   selector: 'app-conditional-visibility-dialog',

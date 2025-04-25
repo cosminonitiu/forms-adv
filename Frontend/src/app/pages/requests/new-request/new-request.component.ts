@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RequestsService } from '../../services/entities/requests.service';
-import { ConditionalVisibility, FormQuestion, FormRequest, FormSection } from '../../shared/models/form-request';
+import { RequestsService } from '../../../services/entities/requests.service';
+import { ConditionalVisibility, FormQuestion, FormRequest, FormSection } from '../../../shared/models/form-request';
 import { Circle, Square } from 'lucide-angular';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { SnackbarHelperService } from '../../services/shared/snackbar-helper.service';
-import { MatDialog } from '@angular/material/dialog';
+import { SnackbarHelperService } from '../../../services/shared/snackbar-helper.service';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ConditionalVisibilityDialogComponent } from './conditional-visibility-dialog/conditional-visibility-dialog.component';
-import { UserStore } from '../../services/stores/user.store';
+import { UserStore } from '../../../services/stores/user.store';
 
 @Component({
   selector: 'app-new-request',
@@ -15,53 +15,38 @@ import { UserStore } from '../../services/stores/user.store';
   templateUrl: './new-request.component.html',
   styleUrl: './new-request.component.scss'
 })
-export class NewRequestComponent implements OnInit{
+export class NewRequestComponent {
   constructor(
     private route: ActivatedRoute, 
     private router: Router,
     private userStore: UserStore,
     private requestsService: RequestsService,
     private snackbar: SnackbarHelperService,
-    private dialog: MatDialog
-  ) {
-    this.route.params.subscribe(params => {
-      this.requestId = params['requestId'];
-    })
-  }
+    private dialog: MatDialog,
+    public dialogRef: MatDialogRef<NewRequestComponent>,
+    @Inject(MAT_DIALOG_DATA)
+    public data: { request: FormRequest}
+  ) {}
 
   public readonly Circle = Circle;
   public readonly Square = Square;
 
-  public requestId: string | null = null;
-  public request: FormRequest | null = null; 
-
   public questionTypes = ['SingleChoice', 'MultipleChoice', 'Text', 'YesNo', 'Date', 'Dropdown' , 'AD'];
-
-  ngOnInit(): void {
-    const userId = this.userStore.currentAccount?.localAccountId;
-    if(userId) {
-      if(this.requestId != '' && this.requestId != null) {
-        this.requestsService.apiFormRequestGet(this.requestId, userId).subscribe((data: FormRequest | null) => {
-          this.request = data;
-        })
-      }
-    }  
-  }
 
 
   addSection() {
-    if(this.request) {
+    if(this.data.request) {
       const newSection: FormSection = {
         id: this.generateGUID(),
         name: "New Section",
         questions: []
       }
-      this.request.sections.push(newSection);
+      this.data.request.sections.push(newSection);
     }
   }
 
   addQuestion(sectionIndex: number) {
-    if(this.request) {
+    if(this.data.request) {
       const newQuestion: FormQuestion = {
         id: this.generateGUID(),
         text: '',
@@ -70,13 +55,13 @@ export class NewRequestComponent implements OnInit{
         options: [],
         conditionalVisibilities: []
       };
-      this.request.sections[sectionIndex].questions.push(newQuestion);
+      this.data.request.sections[sectionIndex].questions.push(newQuestion);
     }
   }
 
   removeQuestion(sectionIndex: number, index: number) {
-    if(this.request) {
-      this.request.sections[sectionIndex].questions.splice(index, 1);
+    if(this.data.request) {
+      this.data.request.sections[sectionIndex].questions.splice(index, 1);
     } 
   }
 
@@ -89,26 +74,26 @@ export class NewRequestComponent implements OnInit{
   }
 
   saveForm() {
-    if(this.request) {
-      this.requestsService.apiFormRequestsPut(this.request).subscribe(() => {
-        this.navigateBack();
+    if(this.data.request) {
+      this.requestsService.apiFormRequestsPut(this.data.request).subscribe(() => {
+        this.onNoClick();
       })
     }
   }
 
-  navigateBack() {
-    //this.router.navigate(['/manage']) //TODO
+  onNoClick(): void {
+    this.dialogRef.close('CLOSE');
   }
   public drop(event: CdkDragDrop<string[]>, sectionIndex: number) {
-    if(this.request){
+    if(this.data.request){
       if(event.previousContainer === event.container) {
-        moveItemInArray(this.request.sections[sectionIndex].questions, event.previousIndex, event.currentIndex);
+        moveItemInArray(this.data.request.sections[sectionIndex].questions, event.previousIndex, event.currentIndex);
       } else {
         try {
           const previousSectionIndex = Number(event.previousContainer.id.split("-")[1])
           transferArrayItem(
-            this.request.sections[previousSectionIndex].questions,
-            this.request.sections[sectionIndex].questions,
+            this.data.request.sections[previousSectionIndex].questions,
+            this.data.request.sections[sectionIndex].questions,
             event.previousIndex,
             event.currentIndex
           );
@@ -119,27 +104,27 @@ export class NewRequestComponent implements OnInit{
     }
   }
   public moveUp(sectionIndex: number, previousIndex: number) {
-    if(this.request){
-      moveItemInArray(this.request.sections[sectionIndex].questions, previousIndex, previousIndex - 1);
+    if(this.data.request){
+      moveItemInArray(this.data.request.sections[sectionIndex].questions, previousIndex, previousIndex - 1);
     }
   }
   public moveDown(sectionIndex: number, previousIndex: number) {
-    if(this.request){
-      moveItemInArray(this.request.sections[sectionIndex].questions, previousIndex, previousIndex + 1);
+    if(this.data.request){
+      moveItemInArray(this.data.request.sections[sectionIndex].questions, previousIndex, previousIndex + 1);
     } 
   }
 
   get connectedDropLists() {
-    if(this.request) {
-      return this.request.sections.map((_, idx) => `category-${idx}`);
+    if(this.data.request) {
+      return this.data.request.sections.map((_, idx) => `category-${idx}`);
     } else {
       return [];
     } 
   }
 
   get connectedNavDropLists() {
-    if(this.request) {
-      return this.request.sections.map((_, idx) => `nav-category-${idx}`);
+    if(this.data.request) {
+      return this.data.request.sections.map((_, idx) => `nav-category-${idx}`);
     } else {
       return [];
     } 
@@ -160,10 +145,10 @@ export class NewRequestComponent implements OnInit{
   }
 
   public onViewConditionalVisibility(question: FormQuestion) {
-    if(this.request) {
+    if(this.data.request) {
       const dialogRef = this.dialog.open(ConditionalVisibilityDialogComponent, {
         panelClass: 'dialog-box',
-        data: { question: question, request: this.request }
+        data: { question: question, request: this.data.request }
       })
       dialogRef.afterClosed().subscribe((data: string | ConditionalVisibility[]) => {
         if(data !== 'CLOSE') {

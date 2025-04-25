@@ -15,15 +15,14 @@ import { MatMenuModule } from '@angular/material/menu';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
-import { RequestsComponent } from './pages/requests/requests.component';
 import { LucideAngularModule } from 'lucide-angular';
 import { RequestCardComponent } from './components/request-card/request-card.component';
-import { NewRequestComponent } from './pages/new-request/new-request.component';
+import { NewRequestComponent } from './pages/requests/new-request/new-request.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SubmitRequestComponent } from './pages/requests/submit-request/submit-request.component';
 import { StringLimitPipe } from './pipes/string-limit.pipe';
 import { ApproveRequestComponent } from './pages/requests/approve-request/approve-request.component';
-import { ConditionalVisibilityDialogComponent } from './pages/new-request/conditional-visibility-dialog/conditional-visibility-dialog.component';
+import { ConditionalVisibilityDialogComponent } from './pages/requests/new-request/conditional-visibility-dialog/conditional-visibility-dialog.component';
 
 import { icons } from 'lucide-angular';
 
@@ -111,7 +110,6 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
 @NgModule({
   declarations: [
     AppComponent,
-    RequestsComponent,
     RequestCardComponent,
     FailedLoginComponent,
     NewRequestComponent,

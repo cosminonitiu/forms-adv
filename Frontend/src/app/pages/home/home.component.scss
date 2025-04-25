@@ -257,6 +257,8 @@
                             }
                         }
                         .no-requests {
+                            margin-top: 2rem;
+                            margin-bottom: 2rem;
                             height: 100%;
                             width: 100%;
                             display: flex;
@@ -492,11 +494,45 @@
     .aumovio-layout {
         .scroll-container {
             .parallel {
+                height: max-content;
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                .main {
+                    position: relative;
+                    transform: none!important;
+                    width: 100%;
+                    top: 0;
+                    height: max-content;
+                    .move-button {
+                        display: none;
+                    }
+                }
                 .main-1 {
-                    height: fit-content;
                     flex-direction: column;
                     .pinned-requests {
                         width: 100%;
+                        height: max-content;
+                        max-height: 50dvh;
+                        .card-grid {
+                            .card-container {
+                                width: 46%;
+                            }
+                        }
+                    }
+                    .overview {
+                        height: max-content;
+                        max-height: 100dvh;
+                        .submitted,.approve {
+                            height: max-content;
+                            max-height: 50dvh;
+                        }
+                    } 
+                }
+                .main-2 {
+                    .all-requests {
+                        height: max-content;
+                        max-height: 80dvh;
                         .card-grid {
                             .card-container {
                                 width: 46%;
@@ -511,6 +547,26 @@
 @media only screen and (max-width: 767px) {
     .aumovio-layout {
         .scroll-container {
+            .banner-container {
+                padding: 0.75rem 0.75rem 0 0.75rem;
+                .banner {
+                    height: 23rem;
+                    .aumovio {
+                        top: 5rem;
+                        font-size: 3rem;
+                    }
+                    .omniforms {
+                        top: 45%;
+                        max-width: 80vw;
+                        .title {
+                            font-size: 1.5rem;
+                        }
+                        .description {
+                            font-size: 0.9rem;
+                        }
+                    }
+                }
+            }
             .parallel {
                 .main-1 {
                     .pinned-requests {
@@ -521,7 +577,20 @@
                         }
                     }
                 } 
+                .main-2 {
+                    .all-requests {
+                        .card-grid {
+                            .card-container {
+                                width: 100%;
+                            }
+                        }
+                    }
+                }
             }  
+        }
+        .account {
+            top: 1.5rem;
+            right: 2rem;
         }
     }
 }
