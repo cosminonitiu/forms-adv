@@ -8,6 +8,8 @@ import { SubmittedConditionalVisibility, SubmittedRequest, SubmittedRequestQuest
 import { ADService } from '../../../services/entities/ad.service';
 import { ADUser } from '../../../shared/models/ad-user';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { RequestsStore } from '../../../services/stores/requests.store';
+import { UserStore } from '../../../services/stores/user.store';
 
 @Component({
   selector: 'app-approve-request',
@@ -20,7 +22,9 @@ export class ApproveRequestComponent {
   constructor(
     private adService: ADService,
     private submittedRequestsService: SubmittedRequestsService,
+    private requestStore: RequestsStore,
     private snackbar: SnackbarHelperService,
+    private userStore: UserStore,
     public dialogRef: MatDialogRef<ApproveRequestComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: { viewOnly: boolean, submittedRequest: SubmittedRequest  }
@@ -29,9 +33,12 @@ export class ApproveRequestComponent {
   }
   
   public ADOptions: ADUser[] = [];
+  public currentUserId: string | null = null;
 
   ngOnInit(): void {
-    if(this.data.submittedRequest) {
+    let activeAccount = this.userStore.currentAccount;
+    if(this.data.submittedRequest && activeAccount && activeAccount.localAccountId) {
+      this.currentUserId = activeAccount.localAccountId;
       this.data.submittedRequest.sections.forEach((s: SubmittedRequestSection) => {
         s.questions.forEach((q: SubmittedRequestQuestion) => {
           q.visible = true;
@@ -45,7 +52,7 @@ export class ApproveRequestComponent {
             if(foundSection) {
               const foundQuestion = foundSection.questions.find(q => q.questionId == c.questionId);
               if(foundQuestion) {
-                if(foundQuestion.type === 'MultipleChoice') {
+                if(q.type === 'MultipleChoice') {
                   if(c.type === 'Equals') {
                     foundQuestion.visible = q.answers.includes(c.option);
                   } else if(c.type === 'NotEquals') {
@@ -66,6 +73,16 @@ export class ApproveRequestComponent {
                       }
                     })
                     foundQuestion.visible = visible;
+                  }
+                } else if(q.type === 'Number'){
+                  if(c.type === 'Equals') {
+                    foundQuestion.visible = parseInt(q.answer) === c.numberOption ? true : false;
+                  } else if(c.type === 'NotEquals') {
+                    foundQuestion.visible = parseInt(q.answer) === c.numberOption ? false : true;
+                  } else if(c.type === 'Contains') {
+                    foundQuestion.visible = c.numberOptions.includes(parseInt(q.answer));
+                  } else if(c.type === 'NotContains') {
+                    foundQuestion.visible = !c.numberOptions.includes(parseInt(q.answer));
                   }
                 } else {
                   if(c.type === 'Equals') {
@@ -139,12 +156,14 @@ export class ApproveRequestComponent {
 
   public approve() {
     this.submittedRequestsService.apiSubmittedRequestsApprove(this.data.submittedRequest.id, this.data.submittedRequest.owner).subscribe(() => {
+      this.requestStore.reloadApprovalRequests(this.currentUserId)
       this.dialogRef.close("DONE")
     })
   }
 
   public reject() {
     this.submittedRequestsService.apiSubmittedRequestsReject(this.data.submittedRequest.id, this.data.submittedRequest.owner).subscribe(() => {
+      this.requestStore.reloadApprovalRequests(this.currentUserId)
       this.dialogRef.close("DONE")
     })
   }

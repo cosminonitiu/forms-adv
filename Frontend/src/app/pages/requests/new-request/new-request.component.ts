@@ -8,6 +8,7 @@ import { SnackbarHelperService } from '../../../services/shared/snackbar-helper.
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ConditionalVisibilityDialogComponent } from './conditional-visibility-dialog/conditional-visibility-dialog.component';
 import { UserStore } from '../../../services/stores/user.store';
+import { RequestsStore } from '../../../services/stores/requests.store';
 
 @Component({
   selector: 'app-new-request',
@@ -23,6 +24,7 @@ export class NewRequestComponent {
     private requestsService: RequestsService,
     private snackbar: SnackbarHelperService,
     private dialog: MatDialog,
+    private requestsStore: RequestsStore,
     public dialogRef: MatDialogRef<NewRequestComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: { request: FormRequest}
@@ -31,7 +33,7 @@ export class NewRequestComponent {
   public readonly Circle = Circle;
   public readonly Square = Square;
 
-  public questionTypes = ['SingleChoice', 'MultipleChoice', 'Text', 'YesNo', 'Date', 'Dropdown' , 'AD'];
+  public questionTypes = ['SingleChoice', 'MultipleChoice', 'Text', 'YesNo', 'Date', 'Dropdown' , 'AD', 'Number'];
 
 
   addSection() {
@@ -53,6 +55,8 @@ export class NewRequestComponent {
         required: false,
         type: 'SingleChoice',
         options: [],
+        maxAnswer: 0,
+        minAnswer: 0,
         conditionalVisibilities: []
       };
       this.data.request.sections[sectionIndex].questions.push(newQuestion);
@@ -76,6 +80,8 @@ export class NewRequestComponent {
   saveForm() {
     if(this.data.request) {
       this.requestsService.apiFormRequestsPut(this.data.request).subscribe(() => {
+        this.requestsStore.reloadOwnedRequests();
+        this.requestsStore.reloadFormRequests();
         this.onNoClick();
       })
     }
@@ -164,6 +170,11 @@ export class NewRequestComponent {
       const v = c === 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
+  }
+
+   // Workaround done since inputs in ngfors make them lose focus after typing
+   public trackByFn(index: any, item: any) {
+    return index;
   }
 }
 

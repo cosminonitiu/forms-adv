@@ -20,6 +20,7 @@ namespace FormAdvanced.Domain.Entities
         SingleChoice,
         MultipleChoice,
         Text,
+        Number,
         YesNo,
         Date,
         Dropdown,
@@ -52,6 +53,8 @@ namespace FormAdvanced.Domain.Entities
         string Type,
         bool Required,
         string[] Options,
+        int? MinAnswer,
+        int? MaxAnswer,
         FormRequestConditionalVisibility[] ConditionalVisibilities
     );
 
@@ -63,6 +66,8 @@ namespace FormAdvanced.Domain.Entities
         string QuestionText,
         string Type,
         string Option,
-        string[] Options
+        int NumberOption,
+        string[] Options,
+        int[] NumberOptions
     );
 }

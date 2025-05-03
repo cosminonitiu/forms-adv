@@ -11,6 +11,7 @@
         padding: 1rem;
         border-radius: 0.5rem;
         background-color: var(--gray-100);  
+        align-items: center;
         .condition-options {
             width: 100%;
             display: flex;
@@ -19,6 +20,18 @@
             flex-wrap: wrap;
         }
     }    
+}
+
+.delete-button {
+  button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    background-color: var(--conti-muted-red);
+    color: var(--gray-50);
+  }
 }
 
 .input-group {

@@ -16,7 +16,7 @@
                             <div class="nav-questions-list" cdkDropList (cdkDropListDropped)="drop($event, idx)" [id]="'nav-category-' + idx" [cdkDropListConnectedTo]="connectedNavDropLists">
                                 <div *ngFor="let question of section.questions; let i = index" class="nav-question-card" cdkDrag cdkDragLockAxis="y" (click)="scrollToQuestion(idx, i)">
                                     <div class="drag-handle" cdkDragHandle>⋮⋮</div>
-                                    <div class="nav-question-content">  {{question.text | stringLimit: 20}}   </div>
+                                    <div class="nav-question-content">  {{question.text }}   </div>
                                 </div>
                             </div>
                         </div>
@@ -37,18 +37,20 @@
                 </header>
                  
                 <div class="form-content">
-                    <div class="form-section">
-                        <label class="section-label">Form Name</label>
-                        <input type="text" [(ngModel)]="data.request.name" placeholder="Enter form name" class="form-input">
+                    <div class="form-overview">
+                        <div class="form-section">
+                            <label class="section-label">Form Name</label>
+                            <input type="text" [(ngModel)]="data.request.name" placeholder="Enter form name" class="form-input">
+                        </div>
+                        <div class="form-section">
+                            <label class="section-label">Form Description</label>
+                            <input type="text" [(ngModel)]="data.request.description" placeholder="Enter form description" class="form-input">
+                        </div>
                     </div>
-                    <div class="form-section">
-                        <label class="section-label">Form Description</label>
-                        <input type="text" [(ngModel)]="data.request.description" placeholder="Enter form description" class="form-input">
-                    </div>
-                
+   
                     <div cdkDropListGroup>
                         @for(section of data.request.sections; track section.id; let idx = $index) {
-                            <div class="form-section">
+                            <div class="form-section section-card">
                                 <div class="section-header">
                                     <div class="form-section">
                                         <label class="section-label">Section Name</label>
@@ -86,7 +88,18 @@
                                                     }
                                                 </select>
                                             </div>
-        
+                                            @if(question.type === 'Number') {
+                                                <div class="min-max-answer">
+                                                    <div class="input-group">
+                                                        <label>Min Answer</label>
+                                                        <input type="number" [(ngModel)]="question.minAnswer" placeholder="Enter min answer">
+                                                    </div>
+                                                    <div class="input-group">
+                                                        <label>Max Answer</label>
+                                                        <input type="number" [(ngModel)]="question.maxAnswer" placeholder="Enter max answer">
+                                                    </div>
+                                                </div>
+                                            }
                                             @if(question.type === 'SingleChoice' || question.type === 'MultipleChoice' || question.type === 'Dropdown') {
                                                 <div class="answer-options">
                                                     <div class="options-header">
@@ -98,7 +111,7 @@
                                                     </div>
                                                     
                                                     <div class="options-list">
-                                                        @for(option of question.options; track option; let optionIndex = $index) {
+                                                        @for(option of question.options; track trackByFn; let optionIndex = $index) {
                                                             <div class="option-item">
                                                                 @if(question.type === 'SingleChoice') {
                                                                     <lucide-angular [size]="16" [img]="Circle"></lucide-angular>
@@ -132,9 +145,6 @@
             </div>  
         </div>       
     }
-    <div mat-dialog-actions class="buttons-wrapper">
-        <button class="basic-button button-outline-main-color" type="button" (click)="onNoClick()">Close</button>
-    </div>
 </div>  
 
 

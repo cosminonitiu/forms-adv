@@ -19,16 +19,18 @@ export interface FormSection {
 export interface FormQuestion {
   id: string;
   text: string;
-  type: 'SingleChoice' | 'MultipleChoice' | 'Text' | 'YesNo' | 'Date' | 'Dropdown' | 'AD';
+  type: 'SingleChoice' | 'MultipleChoice' | 'Text' | 'YesNo' | 'Date' | 'Dropdown' | 'AD' | 'Number';
   options: string[];
   required: boolean;
+  minAnswer: number;
+  maxAnswer: number;
   conditionalVisibilities: ConditionalVisibility[];
 }
 
 export interface FormQuestionNoConditionals { //Strictly for COnditional Visibiltiy Selection
   id: string;
   text: string;
-  type: 'SingleChoice' | 'MultipleChoice' | 'Text' | 'YesNo' | 'Date' | 'Dropdown' | 'AD';
+  type: 'SingleChoice' | 'MultipleChoice' | 'Text' | 'YesNo' | 'Date' | 'Dropdown' | 'AD' | 'Number';
   options: string[];
 }
 
@@ -40,6 +42,9 @@ export interface ConditionalVisibility {
   questionText: string;
   type: 'Equals' | 'NotEquals' | 'Contains' | 'NotContains';
   option: string;
+  numberOption: number;
   options: string[];
+  numberOptions: number[];
   possibleQuestions?: FormQuestionNoConditionals[]; //Strictly for COnditional Visibiltiy Selection
+  isNumberCond?: boolean;
 }

@@ -40,6 +40,8 @@ namespace FormAdvanced.Domain.Entities
         string[] Options,
         string Answer,
         string[] Answers,
+        int? MinAnswer,
+        int? MaxAnswer,
         SubmittedRequestConditionalVisibility[] ConditionalVisibilityTriggerForOtherQuestion
     );
 
@@ -51,6 +53,8 @@ namespace FormAdvanced.Domain.Entities
         string QuestionText,
         string Type,
         string Option,
-        string[] Options
+        int NumberOption,
+        string[] Options,
+        int[] NumberOptions
     );
 }

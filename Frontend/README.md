@@ -1,5 +1,4 @@
 - CACHE
-- ADD Right permissions to approve, view, etc
 - Instead of picking all icons, pick specific ones from lucide angular (app module)
 - Integrate all wise servies into Program.cs
 - Handle all NoSQL exceptions like maybe wrong owner instead of wrong id and etc
@@ -7,3 +6,4 @@
 - Handle null references
 - Make a centralized notification store in user store that handles stuff like if you alreayd approved, rejected, stuff like that
 - Delete notifications on Reject and Approve
+- Delete all conditionals related to question in case of delete question

@@ -19,15 +19,18 @@ export interface SubmittedRequestSection {
   sectionId: string;
   name: string;
   questions: SubmittedRequestQuestion[];
+  requiredDone?: boolean;
 }
   
 export interface SubmittedRequestQuestion {
   questionId: string;
   text: string;
   required: boolean;
-  type: 'SingleChoice' | 'MultipleChoice' | 'Text' | 'YesNo' | 'Date' | 'Dropdown' | 'AD';
+  type: 'SingleChoice' | 'MultipleChoice' | 'Text' | 'YesNo' | 'Date' | 'Dropdown' | 'AD' | 'Number';
   answer: string;
   answers: string[];
+  minAnswer: number;
+  maxAnswer: number;
   options: string[];
   conditionalVisibilityTriggerForOtherQuestion: SubmittedConditionalVisibility[];
   visible?: boolean; // Only for deciding visiblity in the submission form 
@@ -41,7 +44,9 @@ export interface SubmittedConditionalVisibility {
   questionText: string;
   type: 'Equals' | 'NotEquals' | 'Contains' | 'NotContains';
   option: string;
+  numberOption: number;
   options: string[];
+  numberOptions: number[];
 }
 
 export interface SubmittedRequestSaveDraft {

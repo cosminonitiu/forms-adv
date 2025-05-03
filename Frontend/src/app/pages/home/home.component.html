@@ -61,9 +61,9 @@
           </div>
           <div class="divider"></div>
           @if(manageMode === false){
-            @if(loadingState.pinnedRequests === false) {
+            @if(requestsStore.loadingState.pinnedRequests === false) {
               <div class="card-grid">
-                @for(request of pinnedRequests; track request.id) {
+                @for(request of requestsStore.pinnedRequests; track request.id) {
                   <div class="card-container">
                     <app-request-card [request]="request" [manageMode]="false" (generatePdf)="onDownloadPDF(request)"></app-request-card>
                   </div>  
@@ -75,9 +75,9 @@
               </div>
             }
           } @else {
-            @if(loadingState.pinnedManagedRequests === false) {
+            @if(requestsStore.loadingState.pinnedManagedRequests === false) {
               <div class="card-grid">
-                @for(request of pinnedManagedRequests; track request.id) {
+                @for(request of requestsStore.pinnedManagedRequests; track request.id) {
                   <div class="card-container">
                     <app-request-card [request]="request" [manageMode]="true" (generatePdf)="onDownloadPDF(request)"></app-request-card>
                   </div>  
@@ -100,7 +100,7 @@
                   <div class="input-group">
                     <label>Request</label>
                     <select>
-                        @for(type of allRequest; track type) {
+                        @for(type of requestsStore.allRequest; track type) {
                             <option [value]="type.id">{{ type.name }}</option>
                         }
                     </select>
@@ -116,8 +116,8 @@
                 </div>
               </div>
             </div>
-            @if(loadingState.myRequests === false) {
-              @if(submittedRequests.length > 0){
+            @if(requestsStore.loadingState.myRequests === false) {
+              @if(requestsStore.submittedRequests.length > 0){
                 <div class="table">
                   <div class="table-wrapper">
                     <div class="table-wrapper-2">
@@ -134,7 +134,7 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr *ngFor="let request of submittedRequests" (click)="request.state === 'Draft' ? navigateToEditRequest(request) : navigateToViewRequest(request)">
+                            <tr *ngFor="let request of requestsStore.submittedRequests" (click)="request.state === 'Draft' ? navigateToEditRequest(request) : navigateToViewRequest(request)">
                               <td class="checkbox-col">
                                 <input type="checkbox">
                               </td>
@@ -171,7 +171,7 @@
                   <div class="input-group">
                     <label>Request</label>
                     <select>
-                        @for(type of allRequest; track type) {
+                        @for(type of requestsStore.allRequest; track type) {
                             <option [value]="type.id">{{ type.name }}</option>
                         }
                     </select>
@@ -187,8 +187,8 @@
                 </div>
               </div>
             </div>
-            @if(loadingState.myRequests === false) {
-              @if(requestsToApprove.length > 0){
+            @if(requestsStore.loadingState.myRequests === false) {
+              @if(requestsStore.requestsToApprove.length > 0){
                 <div class="table">
                   <div class="table-wrapper">
                     <div class="table-wrapper-2">
@@ -206,7 +206,7 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr *ngFor="let request of requestsToApprove" (click)="navigateToApproveRequest(request)">
+                            <tr *ngFor="let request of requestsStore.requestsToApprove" (click)="navigateToApproveRequest(request)">
                               <td class="checkbox-col">
                                 <input type="checkbox">
                               </td>
@@ -254,9 +254,9 @@
           </div>
           <div class="divider"></div>
           @if(manageMode === false){
-            @if(loadingState.formRequests === false) {
+            @if(requestsStore.loadingState.formRequests === false) {
               <div class="card-grid">
-                @for(request of allRequest; track request.id) {
+                @for(request of requestsStore.allRequest; track request.id) {
                   <div class="card-container">
                     <app-request-card [request]="request" [manageMode]="false" (generatePdf)="onDownloadPDF(request)"></app-request-card>
                   </div>  
@@ -268,9 +268,9 @@
               </div>
             }
           } @else {
-            @if(loadingState.manageRequests  === false) {
+            @if(requestsStore.loadingState.manageRequests  === false) {
               <div class="card-grid">
-                @for(request of allManagedRequests; track request.id) {
+                @for(request of requestsStore.allManagedRequests; track request.id) {
                   <div class="card-container">
                     <app-request-card [request]="request" [manageMode]="true" (generatePdf)="onDownloadPDF(request)"></app-request-card>
                   </div>  

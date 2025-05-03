@@ -12,6 +12,7 @@ import { ADService } from '../../../services/entities/ad.service';
 import { ADUser } from '../../../shared/models/ad-user';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { UserStore } from '../../../services/stores/user.store';
+import { RequestsStore } from '../../../services/stores/requests.store';
 
 @Component({
   selector: 'app-submit-request',
@@ -29,6 +30,7 @@ export class SubmitRequestComponent implements OnInit{
     private adService: ADService,
     private submittedRequestsService: SubmittedRequestsService,
     private snackbar: SnackbarHelperService,
+    private requestsStore: RequestsStore,
     public dialogRef: MatDialogRef<SubmitRequestComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: { draft: boolean, request?: FormRequest, submittedRequest?: SubmittedRequest  }
@@ -91,6 +93,16 @@ export class SubmitRequestComponent implements OnInit{
                   })
                   foundQuestion.visible = visible;
                 }
+              } else if(foundQuestion.type === 'Number') {
+                if(c.type === 'Equals') {
+                  foundQuestion.visible = parseInt(q.answer) === c.numberOption ? true : false;
+                } else if(c.type === 'NotEquals') {
+                  foundQuestion.visible = parseInt(q.answer) === c.numberOption ? false : true;
+                } else if(c.type === 'Contains') {
+                  foundQuestion.visible = c.numberOptions.includes(parseInt(q.answer));
+                } else if(c.type === 'NotContains') {
+                  foundQuestion.visible = !c.numberOptions.includes(parseInt(q.answer));
+                }
               } else {
                 if(c.type === 'Equals') {
                   foundQuestion.visible = q.answer === c.option ? true : false;
@@ -124,6 +136,7 @@ export class SubmitRequestComponent implements OnInit{
           }
         }
       })
+      s.requiredDone = this.isSectionRequiredDone(s);
     })
   }
 
@@ -162,7 +175,9 @@ export class SubmitRequestComponent implements OnInit{
             answers: [],
             options: q.options,
             conditionalVisibilityTriggerForOtherQuestion:[],
-            visible: true
+            visible: true,
+            maxAnswer: q.maxAnswer,
+            minAnswer: q.minAnswer
           }
           q.conditionalVisibilities.forEach((c: ConditionalVisibility) => {
             if(c.type === 'Contains' || c.type === 'Equals') {
@@ -171,13 +186,15 @@ export class SubmitRequestComponent implements OnInit{
           })
           if(q.type === 'YesNo') {
             newQuestion.booleanAnswer = false;
+            newQuestion.answer = 'No';
           }
           newSection.questions.push(newQuestion);
         })
+        newSection.requiredDone = this.isSectionRequiredDone(newSection);
         this.formToSubmit?.sections.push(newSection);
       })
 
-      // Attach Triggers for Visiblity to Questions
+      // Attach Triggers for Visiblity to Questions and Required Done
       request.sections.forEach((s: FormSection) => {
         s.questions.forEach((q: FormQuestion) => {
           q.conditionalVisibilities.forEach((c: ConditionalVisibility) => {
@@ -192,7 +209,9 @@ export class SubmitRequestComponent implements OnInit{
                   questionText: q.text,
                   type: c.type,
                   option: c.option,
-                  options: c.options
+                  numberOption: c.numberOption,
+                  options: c.options,
+                  numberOptions: c.numberOptions
                 }
                 foundQuestion.conditionalVisibilityTriggerForOtherQuestion.push(newConditions);
               } else {
@@ -205,7 +224,7 @@ export class SubmitRequestComponent implements OnInit{
         })
       })
 
-      // Conditional AD Options load
+      // Conditional AD Options load 
       let adquestionpresent = false;
       request.sections.forEach((s: FormSection) => {
         s.questions.forEach((q: FormQuestion) => {
@@ -228,7 +247,7 @@ export class SubmitRequestComponent implements OnInit{
         if(foundSection) {
           const foundQuestion = foundSection.questions.find(q => q.questionId == c.questionId);
           if(foundQuestion) {
-            if(foundQuestion.type === 'MultipleChoice') {
+            if(question.type === 'MultipleChoice') {
               if(c.type === 'Equals') {
                 foundQuestion.visible = question.answers.includes(c.option);
               } else if(c.type === 'NotEquals') {
@@ -250,6 +269,16 @@ export class SubmitRequestComponent implements OnInit{
                 })
                 foundQuestion.visible = visible;
               }
+            } else if(question.type === 'Number') {
+              if(c.type === 'Equals') {
+                foundQuestion.visible = parseInt(question.answer) === c.numberOption ? true : false;
+              } else if(c.type === 'NotEquals') {
+                foundQuestion.visible = parseInt(question.answer) === c.numberOption ? false : true;
+              } else if(c.type === 'Contains') {
+                foundQuestion.visible = c.numberOptions.includes(parseInt(question.answer));
+              } else if(c.type === 'NotContains') {
+                foundQuestion.visible = !c.numberOptions.includes(parseInt(question.answer));
+              }
             } else {
               if(c.type === 'Equals') {
                 foundQuestion.visible = question.answer === c.option ? true : false;
@@ -269,6 +298,9 @@ export class SubmitRequestComponent implements OnInit{
         }
       })
     }
+    if(question.required === true && this.currentSection) {
+      this.currentSection.requiredDone = this.isSectionRequiredDone(this.currentSection);
+    }
   }
 
   public onYesNoAnswerChange(question: SubmittedRequestQuestion) {
@@ -280,6 +312,17 @@ export class SubmitRequestComponent implements OnInit{
     if(question.conditionalVisibilityTriggerForOtherQuestion.length > 0){
       this.onAnswerChange(question);
     }
+  }
+
+  public onNumberAnswerChange(question: SubmittedRequestQuestion) {
+    if(parseInt(question.answer) < question.minAnswer) {
+      question.answer = question.minAnswer.toString();
+    } else if(parseInt(question.answer) > question.maxAnswer) {
+      question.answer = question.maxAnswer.toString();
+    }
+    if(question.conditionalVisibilityTriggerForOtherQuestion.length > 0){
+      this.onAnswerChange(question);
+    } 
   }
 
   currentSectionIndex = 0;
@@ -303,15 +346,16 @@ export class SubmitRequestComponent implements OnInit{
   }
 
   nextSection(): void {
-    const requiredDone = this.isSectionRequiredDone();
-    if(requiredDone === true){
-      if (!this.isLastSection) {
-        this.currentSectionIndex++;
+    if(this.currentSection) {
+      const requiredDone = this.isSectionRequiredDone(this.currentSection);
+      if(requiredDone === true){
+        if (!this.isLastSection) {
+          this.currentSectionIndex++;
+        }
+      } else {
+        this.snackbar.createErrorNotification("Required questions have to be completed")
       }
-    } else {
-      this.snackbar.createErrorNotification("Required questions have to be completed")
-    }
-    
+    } 
   }
 
   previousSection(): void {
@@ -321,7 +365,8 @@ export class SubmitRequestComponent implements OnInit{
   }
 
   public submit() {
-    const requiredDone = this.isSectionRequiredDone();
+    if(this.currentSection) {
+      const requiredDone = this.isSectionRequiredDone(this.currentSection);
     if(requiredDone === true){
       if(this.data.draft === false && this.formToSubmit && this.data.request) {
         const model: SubmittedRequestSaveDraft = {
@@ -331,6 +376,7 @@ export class SubmitRequestComponent implements OnInit{
         }
         this.submittedRequestsService.apiSaveDraftRequestsPost(model).subscribe((id: string) => {
           this.submittedRequestsService.apiSubmittedRequestsSubmit(id).subscribe(() => {
+            this.requestsStore.reloadSubmittedRequests(this.data.request?.owner);
             this.onNoClick();
           })
         })
@@ -341,6 +387,7 @@ export class SubmitRequestComponent implements OnInit{
         }
         this.submittedRequestsService.apiSubmittedRequestsUpdate(model).subscribe((id: string) => {
           this.submittedRequestsService.apiSubmittedRequestsSubmit(model.id).subscribe(() => {
+            this.requestsStore.reloadSubmittedRequests(this.data.request?.owner);
             this.dialogRef.close('SUBMIT');
           })
         })
@@ -348,6 +395,7 @@ export class SubmitRequestComponent implements OnInit{
     } else {
       this.snackbar.createErrorNotification("Required questions have to be completed")
     } 
+    }  
   }
 
   public saveAsDraft() {
@@ -358,6 +406,7 @@ export class SubmitRequestComponent implements OnInit{
         sections: this.formToSubmit.sections
       }
       this.submittedRequestsService.apiSaveDraftRequestsPost(model).subscribe((id: string) => {
+        this.requestsStore.reloadSubmittedRequests(this.data.request?.owner);
         this.onNoClick();
       })
     }   
@@ -389,26 +438,26 @@ export class SubmitRequestComponent implements OnInit{
     }
   }
 
-  public isSectionRequiredDone(): boolean {
-    if(this.currentSection) {
-      let requiredDone = true;
-      this.currentSection.questions.forEach((q: SubmittedRequestQuestion) => {
-        if(q.required === true && q.visible === true) {
-          if(q.type === 'SingleChoice' || q.type === 'Dropdown' || q.type === 'Date' || q.type === 'AD' || q.type === 'Text') {
-            if(q.answer.length === 0 || !q.answer) {
-              requiredDone = false;
-            } 
-          } else if(q.type === 'MultipleChoice') {
-            if(q.answers.length === 0 || !q.answers) {
-              requiredDone = false;
-            }
+  public isSectionRequiredDone(section: SubmittedRequestSection): boolean {
+    let requiredDone = true;
+    section.questions.forEach((q: SubmittedRequestQuestion) => {
+      if(q.required === true && q.visible === true) {
+        if(q.type === 'SingleChoice' || q.type === 'Dropdown' || q.type === 'Date' || q.type === 'AD' || q.type === 'Text') {
+          if(q.answer.length === 0 || !q.answer) {
+            requiredDone = false;
+          } 
+        } else if(q.type === 'MultipleChoice') {
+          if(q.answers.length === 0 || !q.answers) {
+            requiredDone = false;
+          }
+        } else if(q.type === 'Number') {
+          if(q.answer === null || q.answer === undefined || q.answer === '') {
+            requiredDone = false;
           }
         }
-      })
-      return requiredDone;
-    } else {
-      return false;
-    }
+      }
+    })
+    return requiredDone;
   }
 
   onNoClick(): void {

@@ -38,6 +38,7 @@ export class ConditionalVisibilityDialogComponent implements OnInit{
         } else {
           cond.possibleQuestions = [];
         }
+        this.onPossibleQuestionChange(cond.questionId, cond);
       })
     }
   }
@@ -54,7 +55,9 @@ export class ConditionalVisibilityDialogComponent implements OnInit{
           sectionName: firstSection.name,
           type: 'Equals',
           option: '',
-          options: []
+          numberOption: 0,
+          options: [],
+          numberOptions: []
         }
         newCondition.possibleQuestions = firstSection.questions.map((q) => {
           const question: FormQuestionNoConditionals = {
@@ -65,6 +68,7 @@ export class ConditionalVisibilityDialogComponent implements OnInit{
           }
           return question;
         })
+        this.onPossibleQuestionChange(newCondition.questionId, newCondition);
         this.currentConditions.push(newCondition);
       }
     }
@@ -87,8 +91,29 @@ export class ConditionalVisibilityDialogComponent implements OnInit{
     }
   }
 
+  public onPossibleQuestionChange(event: any, cond: ConditionalVisibility) {
+    var question = cond.possibleQuestions?.find(q => q.id === event);
+    if(question) {
+      if(question.type === 'Number') {
+        cond.isNumberCond =  true;
+      } else {
+        cond.isNumberCond = false;
+      }
+    } else {
+      console.log("ERROR SWITCHING QUESTION TYPE")
+    }
+  }
+
   public addOption(cond: ConditionalVisibility) {
-    cond.options.push('')
+    if(cond.isNumberCond === true) {
+      cond.numberOptions.push(0)
+    } else {
+      cond.options.push('')
+    }
+  }
+  
+  public deleteCondition(condIndex: number) {
+    this.currentConditions.splice(condIndex, 1);
   }
 
   onSave(): void {

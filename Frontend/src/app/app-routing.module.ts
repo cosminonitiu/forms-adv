@@ -12,13 +12,13 @@ const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
-    children: [
-      { path: '', pathMatch: 'full', redirectTo: 'newrequests' },
-      { path: 'not-found', component: NotFoundPageComponent },
-      { path: 'profile', component: ProfileComponent },
-      { path: '**', redirectTo: '/not-found', pathMatch: 'full' }
-    ],
-    canActivateChild: [MsalGuard]
+    // children: [
+    //   { path: '', pathMatch: 'full', redirectTo: 'newrequests' },
+    //   { path: 'not-found', component: NotFoundPageComponent },
+    //   { path: 'profile', component: ProfileComponent },
+    //   { path: '**', redirectTo: '/not-found', pathMatch: 'full' }
+    // ],
+    canActivate: [MsalGuard]
   },
   {
     path: 'login-failed',

@@ -33,6 +33,10 @@
                       <input type="text" class="text-input" [ngModel]="question.answer" disabled>
                   }
                   
+                  @else if (question.type === 'Number') {
+                    <input type="number" class="text-input" [ngModel]="question.answer" disabled>
+                  }
+
                   @else if (question.type === 'SingleChoice') {
                       <input type="text" class="text-input" [ngModel]="question.answer" disabled>
                   }
@@ -76,7 +80,7 @@
           Previous
         </button>
         @if(data.viewOnly === false){
-          <button class="nav-button button-outline-main-color" (click)="reject()">Reject</button>
+          <button class="nav-button button-muted-red" (click)="reject()">Reject</button>
         }
         @if(isLastSection) {
           @if(data.viewOnly === false){
@@ -93,7 +97,7 @@
     </div>
   } @else {
     <div mat-dialog-actions class="buttons-wrapper">
-      <button class="basic-button button-outline-main-color" type="button" (click)="onNoClick()">Close</button>
+      <button class="basic-button button-cool-indigo" type="button" (click)="onNoClick()">Close</button>
     </div>
   }
   

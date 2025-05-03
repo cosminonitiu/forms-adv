@@ -268,13 +268,23 @@
     --conti-cool-indigo: #5b4bb0;
 }
 
-.blue-to-purple-text {
-    background: -webkit-linear-gradient(#4C6EF5, #6f42c1);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.mdc-switch {
+  .mdc-switch__handle {
+    height: 20px!important;
+  }
+  .mdc-switch__track {
+    height: 28px!important;
+  }
 }
-.cursor-pointer {
-    cursor: pointer;
+.mdc-switch .mdc-switch__track::after:hover {
+  background-color: transparent!important;
+}
+.mdc-switch .mdc-switch__track::after {
+  background-color: var(--conti-warm-orange)!important;
+  background: radial-gradient(circle,rgba(91, 75, 176, 1) 0%, rgba(126, 26, 122, 1) 26%, rgba(193, 55, 77, 1) 66%, rgba(235, 94, 37, 1) 93%, rgba(240, 147, 34, 1) 100%)!important;
+}
+.mdc-switch .mdc-switch__track::before {
+  border-color: transparent!important;
 }
 
 * ::-webkit-scrollbar {
@@ -286,15 +296,6 @@
 *  ::-webkit-scrollbar-thumb {
     background-color: var(--gray-300);
     border-radius: 5px;
-}
-
-.white-background {
-    background-color: var(--gray-50)!important;
-}
-
-.scrollable {
-    overflow-x: auto;
-    overflow-y: auto;
 }
 
 .theme-success-background {
@@ -363,7 +364,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 1.75rem 1.5rem 1.75rem 1.5rem;
+    padding: 0.5rem 2rem 0.5rem 1.5rem;
     .dialog-title-info {
       display: flex;
       flex-direction: row;
@@ -372,9 +373,8 @@
       align-items: center;
     }
     .dialog-close {
-      app-icon-helper {
-        cursor: pointer;
-      }
+      cursor: pointer;
+      font-size: 1.5rem;
     }
   }
   .basic-dialog-body {
@@ -417,8 +417,23 @@
     filter: grayscale(80%) contrast(0.5);
     color: var(--gray-50)!important;
   }
-  .button-outline-main-color {
-    background-color: transparent!important;
-    border: 1px var(--primary) solid!important;
-    color: var(--primary)!important;
+  .button-warm-orange {
+    background-color: var(--conti-warm-orange);
+    color: var(--gray-50);
+  }
+  .button-deep-purple {
+    background-color: var(--conti-deep-purple);
+    color: var(--gray-50);
+  }
+  .button-bright-orange {
+    background-color: var(--conti-bright-orange);
+    color: var(--gray-50);
+  }
+  .button-muted-red {
+    background-color: var(--conti-muted-red);
+    color: var(--gray-50);
+  }
+  .button-cool-indigo {
+    background-color: var(--conti-cool-indigo);
+    color: var(--gray-50);
   }

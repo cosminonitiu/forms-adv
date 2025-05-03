@@ -13,15 +13,9 @@ import { RequestsService } from '../../services/entities/requests.service';
 import { FormQuestion, FormRequest, FormSection } from '../../shared/models/form-request';
 import jsPDF from 'jspdf';
 import { SubmitRequestComponent } from '../requests/submit-request/submit-request.component';
+import { RequestsStore } from '../../services/stores/requests.store';
 
-export interface LoadingState {
-  pinnedRequests: boolean;
-  pinnedManagedRequests: boolean;
-  formRequests: boolean;
-  manageRequests: boolean;
-  myRequests: boolean;
-  requestsToApprove: boolean;
-}
+
 
 @Component({
   selector: 'app-home',
@@ -36,6 +30,7 @@ export class HomeComponent {
     private notifcationService: NotificationsService,
     private formRequestsService: RequestsService,
     private submittedRequestsService: SubmittedRequestsService,
+    public requestsStore: RequestsStore,
     private dialog: MatDialog,
     private elementRef: ElementRef) { 
       fetch('../../../../assets/fonts/Inter.txt')
@@ -53,48 +48,15 @@ export class HomeComponent {
       this.notifcationService.apiNotificationGet().subscribe((data => {
         this.userStore.currentNotifications = data;
       }))
-      this.formRequestsService.apiFormRequestsGet().subscribe((data: FormRequest[]) => {
-        this.pinnedRequests = data.slice(0, 3);
-        this.allRequest = data;
-        this.loadingState.pinnedRequests = false;
-        this.loadingState.formRequests = false;
-      })
-      this.formRequestsService.apiFormRequestsGetOwner().subscribe((data: FormRequest[]) => {
-        this.pinnedManagedRequests = data.slice(0, 3);
-        this.allManagedRequests = data;
-        this.loadingState.pinnedManagedRequests = false;
-        this.loadingState.manageRequests = false;
-      })
-      this.submittedRequestsService.apiApprovalRequestsGet(this.userStore.currentAccount.localAccountId).subscribe((data: SubmittedRequest[]) => {
-        this.requestsToApprove = data;
-        this.loadingState.requestsToApprove = false;
-      })
-      this.submittedRequestsService.apiSubmittedRequestsGet(this.userStore.currentAccount.localAccountId).subscribe((data: SubmittedRequest[]) => {
-        this.submittedRequests = data;
-        this.loadingState.myRequests = false;
-      })
+      this.requestsStore.initializeRequests(this.userStore.currentAccount.localAccountId);
     }
   }
 
-  public loadingState: LoadingState = {
-    pinnedRequests: true,
-    pinnedManagedRequests: true,
-    formRequests: true,
-    manageRequests: true,
-    myRequests: true,
-    requestsToApprove: true
-  }
+  
   public manageMode = false;
   public switchManageMode() {
     this.manageMode = !this.manageMode;
   }
-
-  public pinnedRequests: FormRequest[] = [];
-  public pinnedManagedRequests: FormRequest[] = [];
-  public allRequest: FormRequest[] = [];
-  public allManagedRequests: FormRequest[] = [];
-  public submittedRequests: SubmittedRequest[] = [];
-  public requestsToApprove: SubmittedRequest[] = [];
 
   public statuses = ['Approved', 'Rejected', 'Submitted'];
 
@@ -117,14 +79,6 @@ export class HomeComponent {
   closeNotifications() {
     this.isNotificationScrenOpen = false;
   }
-
-  // navigateTo(path: string) {
-  //   this.router.navigate(['/' + path]);
-  // }
-
-  // isActive(path: string): boolean {
-  //   return this.router.url.includes(path);
-  // }
 
   navigateToApproveRequestFromNotif(notification: Notification, nIndex: number) {
     this.submittedRequestsService.apiSubmtitedRequestGet(notification.submittedRequestId, notification.requesterUID).subscribe((data: SubmittedRequest | null) => {
