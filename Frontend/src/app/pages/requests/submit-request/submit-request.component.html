@@ -32,20 +32,25 @@
                   <label class="question-text">{{ question.text }}</label>
                   
                   @if (question.type === 'Text') {
-                    <input type="text" class="text-input" placeholder="Type your answer here..." [(ngModel)]="question.answer" (ngModelChange)="question.conditionalVisibilityTriggerForOtherQuestion.length > 0 ? onAnswerChange(question) : null">
+                    <input type="text" class="text-input" placeholder="Type your answer here..." [(ngModel)]="question.answer" (ngModelChange)="onAnswerChange(question)">
                   }
 
                   @else if (question.type === 'Number') {
                     <input type="number" class="text-input" placeholder="Type a number here..." [min]="question.minAnswer" [max]="question.maxAnswer"
                     [(ngModel)]="question.answer" (ngModelChange)="onNumberAnswerChange(question)">
-                    <p>Mininum answer {{question.minAnswer}} , Maximum Answer {{question.maxAnswer}}</p>
+                    @if(question.minAnswer !== null) {
+                      <p>Mininum answer {{question.minAnswer}}</p>  
+                    }
+                    @if(question.maxAnswer !== null) {
+                      <p>Maximum answer {{question.maxAnswer}}</p>
+                    }
                   }
                   
                   @else if (question.type === 'SingleChoice') {
                     <div class="options-container">
                       @for (option of question.options; track option) {
                         <label class="option">
-                          <input type="radio" name="question-{{question.questionId}}" [value]="option" [(ngModel)]="question.answer" (ngModelChange)="question.conditionalVisibilityTriggerForOtherQuestion.length > 0 ? onAnswerChange(question) : null">
+                          <input type="radio" name="question-{{question.questionId}}" [value]="option" [(ngModel)]="question.answer" (ngModelChange)="onAnswerChange(question)">
                           <span class="option-text">{{ option }}</span>
                         </label>
                       }
@@ -65,7 +70,7 @@
       
                   @else if (question.type === 'Dropdown') {
                     <div class="input-group">
-                      <select [(ngModel)]="question.answer" (ngModelChange)="question.conditionalVisibilityTriggerForOtherQuestion.length > 0 ? onAnswerChange(question) : null">
+                      <select [(ngModel)]="question.answer" (ngModelChange)="onAnswerChange(question)">
                           @for(option of question.options; track option) {
                               <option [value]="option">{{ option }}</option>
                           }
@@ -76,7 +81,7 @@
   
                   @else if (question.type === 'AD') {
                     <div class="input-group">
-                      <select [(ngModel)]="question.answer" (ngModelChange)="question.conditionalVisibilityTriggerForOtherQuestion.length > 0 ? onAnswerChange(question) : null">
+                      <select [(ngModel)]="question.answer" (ngModelChange)="onAnswerChange(question)">
                           @for(option of ADOptions; track option.id) {
                               <option [value]="option.id">{{ option.displayName }} ( {{option.userPrincipalName}} )</option>
                           }
@@ -94,7 +99,7 @@
                   }
       
                   @else if (question.type === 'Date') {
-                    <input type="date" class="date-input" [(ngModel)]="question.answer" (ngModelChange)="question.conditionalVisibilityTriggerForOtherQuestion.length > 0 ? onAnswerChange(question) : null">
+                    <input type="date" class="date-input" [(ngModel)]="question.answer" (ngModelChange)=" onAnswerChange(question)">
                   }
                 </div> 
                 @if(question.required === true){

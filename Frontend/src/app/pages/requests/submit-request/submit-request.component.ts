@@ -309,9 +309,7 @@ export class SubmitRequestComponent implements OnInit{
     } else {
       question.answer = 'No';
     }
-    if(question.conditionalVisibilityTriggerForOtherQuestion.length > 0){
-      this.onAnswerChange(question);
-    }
+    this.onAnswerChange(question);
   }
 
   public onNumberAnswerChange(question: SubmittedRequestQuestion) {
@@ -320,9 +318,7 @@ export class SubmitRequestComponent implements OnInit{
     } else if(parseInt(question.answer) > question.maxAnswer) {
       question.answer = question.maxAnswer.toString();
     }
-    if(question.conditionalVisibilityTriggerForOtherQuestion.length > 0){
-      this.onAnswerChange(question);
-    } 
+    this.onAnswerChange(question);
   }
 
   currentSectionIndex = 0;
